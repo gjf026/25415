@@ -256,7 +256,7 @@ public class M3u8 {
 
     private static boolean isDouble(String ad) {
         try {
-            return Double.parseDouble(ad) > 0;
+            return Double.parseDouble(ad) !=0;
         } catch (Exception e) {
             return false;
         }
