@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -226,10 +227,29 @@ public class M3u8 {
         Matcher m1 = REGEX_X_DISCONTINUITY.matcher(line);
         while (m1.find()) {
             String group = m1.group();
-            BigDecimal t = BigDecimal.ZERO;
             Matcher m2 = REGEX_MEDIA_DURATION.matcher(group);
-            if (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
-            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replace(group.replace(TAG_ENDLIST, ""), "");
+//            BigDecimal t = BigDecimal.ZERO;
+//            if (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
+
+            BigDecimal ft = BigDecimal.ZERO;
+            BigDecimal lt = BigDecimal.ZERO;
+            while (m2.find()) {
+                if (ft.equals(BigDecimal.ZERO)) {
+                    ft = new BigDecimal(m2.group(1));
+                }
+                lt = new BigDecimal(m2.group(1));
+            }
+            for (String ad : ads) {
+                if (ad.startsWith("-")) {
+                    if (lt.toString().equals(ad)) {
+                        line = line.replace(group.replace(TAG_ENDLIST, ""), "");
+                    }
+                } else {
+                    if (ft.toString().equals(ad)) {
+                        line = line.replace(group.replace(TAG_ENDLIST, ""), "");
+                    }
+                }
+            }
         }
         return line;
     }
