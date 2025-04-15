@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -180,7 +179,7 @@ public class M3u8 {
                 String domain = (ifirst > 0) ? absoluteUrl.substring(0, ifirst) : absoluteUrl;
                 // 保留条件：域名等于出现次数最多的，或者该域名出现次数超过timesNoAd次
                 Integer cnt = preUrlMap.get(domain);
-                if (domain.equals(maxTimesPreUrl) || (cnt != null && cnt > timesNoAd)) {
+                if (domain.equals(maxTimesPreUrl) || (cnt != null && cnt >= timesNoAd)) {
                     lines[i] = absoluteUrl;
                 } else {
                     if (i > 0 && lines[i - 1].length() > 0 && lines[i - 1].charAt(0) == '#') {
@@ -230,6 +229,7 @@ public class M3u8 {
             Matcher m2 = REGEX_MEDIA_DURATION.matcher(group);
 //            BigDecimal t = BigDecimal.ZERO;
 //            if (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
+//            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replace(group.replace(TAG_ENDLIST, ""), "");
 
             BigDecimal ft = BigDecimal.ZERO;
             BigDecimal lt = BigDecimal.ZERO;
@@ -241,22 +241,24 @@ public class M3u8 {
             }
             for (String ad : ads) {
                 if (ad.startsWith("-")) {
-                    if (lt.toString().equals(ad)) {
+                    ad=ad.replace("-","");
+                    if (lt.toString().startsWith(ad)) {
                         line = line.replace(group.replace(TAG_ENDLIST, ""), "");
                     }
                 } else {
-                    if (ft.toString().equals(ad)) {
+                    if (ft.toString().startsWith(ad)) {
                         line = line.replace(group.replace(TAG_ENDLIST, ""), "");
                     }
                 }
             }
+
         }
         return line;
     }
 
     private static boolean isDouble(String ad) {
         try {
-            return Double.parseDouble(ad) !=0;
+            return Double.parseDouble(ad) != 0;
         } catch (Exception e) {
             return false;
         }
